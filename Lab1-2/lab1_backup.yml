@@ -1,0 +1,118 @@
+---
+- name: Install Docker
+  hosts: all
+  become: true
+  tasks:
+    - name: Load app variables
+      include_vars:
+        file: "app.yml"
+        
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+- name: Clone repository from git
+  hosts: app
+  become: true
+  become_method: sudo
+  tasks:
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+
+    - name: Delete app directory
+      file:
+        path: "{{ app_path }}"
+        state: absent
+
+    - name: Clone remote git repository
+      git:
+        repo: "{{ repository }}"
+        dest: "{{ app_path }}"
+        force: yes
+        
+    - name: Copy Dockerfile to app directory
+      copy:
+        src: "{{ dockerfile_path }}"  # Исходное местоположение Dockerfile
+        dest: "{{ app_path }}/Dockerfile"  # Назначение
+
+    - name: Install Django
+      pip:
+        name: django
+        
+    - name: Install python-dotenv
+      pip:
+        name: python-dotenv
+        
+    - name: Install dj_database_url
+      pip:
+        name: dj_database_url
+
+    - name: Make migrations
+      command: "python3 {{ app_path }}/manage.py makemigrations"
+      
+    - name: Migrate
+      command: "python3 {{ app_path }}/manage.py migrate"
+      
+    - name: Install whitenoise
+      pip:
+        name: whitenoise
+
+
+    - name: Collect static
+      command: "python3 {{ app_path }}/manage.py collectstatic --noinput"
+
+    - name: Run the standard tests
+      command: "python3 {{ app_path }}/manage.py test"
+
+    - name: Stop instance
+      shell: "sudo docker rm -f {{ docker_container_name }}"
+      ignore_errors: yes
+
+    - name: Configuration docker image
+      docker_image:
+        build:
+          path: "{{ app_path }}"
+        name: "{{ docker_image_name }}"
+        state: present
+        source: build
+
+    - name: Start docker container
+      shell: "sudo docker run -d -p {{ docker_container_port }}:80 --name {{ docker_container_name }} {{ docker_image_name }}:latest"

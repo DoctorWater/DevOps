@@ -1,0 +1,5 @@
+# requirements.yml
+
+- name: Docker
+  src: git+https://gitlab.com/ansibleroles-mk/AnsibleRoles
+  version: master
