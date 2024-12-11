@@ -1,0 +1,7 @@
+---
+app_path: "/home/vagrant/DevOPs/Lab3-N/AppDir"
+repository: "https://github.com/mdn/django-locallibrary-tutorial.git"
+docker_image_name: "django_app"
+docker_container_name: "django_app"
+docker_container_port: "808"
+dockerfile_path: "/home/malck/DevOPs/Lab3-N/Dockerfile"

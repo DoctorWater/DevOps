@@ -1,0 +1,14 @@
+# requirements.yml
+
+- name: Docker
+  src: git+https://gitlab.com/ansibleroles-mk/AnsibleRoles.git
+  scm: git
+  version: master
+  path: Docker
+
+- name: Nginx
+  src: git+https://gitlab.com/ansibleroles-mk/AnsibleRoles.git
+  scm: git
+  version: master
+  path: Nginx
+
