@@ -1,0 +1,8 @@
+# requirements.yml
+
+- name: openvpn
+  src: git+https://gitlab.com/ansibleroles-mk/AnsibleRoles.git
+  scm: git
+  version: master
+  path: openvpn
+
