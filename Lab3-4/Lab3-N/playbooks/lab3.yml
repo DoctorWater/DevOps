@@ -10,9 +10,6 @@
         path: "{{ nginx_root_default }}/{{ nginx_static_files_url }}"
         state: directory
 
-    - name: Debug static files path
-      debug:
-        msg: "{{ nginx_root_default }}/{{ nginx_static_files_url }}"
     - name: Copy static html document
       copy:
         src: "/home/malck/DevOPs/Lab3-N/staticfiles/"
