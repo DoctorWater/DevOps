@@ -1,0 +1,28 @@
+ENV['VAGRANT_SERVER_URL'] = 'http://vagrant.elab.pro'
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+
+  # Количество требуемых машин
+  SERVERS = 2
+  # Имя сетевого интерфейса для организации моста
+  BRIDGE = "wlp2s0"
+
+  def create_host(config, hostname, ip)
+    config.vm.define hostname do |host|
+      host.vm.provider "virtualbox" do |vb|
+        vb.memory = "1024" # Указываем память и другие настройки VirtualBox
+      end
+      host.vm.network "private_network", ip: ip
+      host.vm.network "public_network", bridge: BRIDGE
+      host.vm.hostname = hostname
+      host.vm.provision "shell", inline: "apt-get update && apt-get install -y python"
+      yield host if block_given?
+    end
+  end
+
+  # Создаем несколько машин
+  (1..SERVERS).each do |machine_id|
+    create_host(config, "srv#{machine_id}", "192.168.56.#{200 + machine_id}")
+  end
+end
+
