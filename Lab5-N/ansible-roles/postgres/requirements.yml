@@ -1,0 +1,3 @@
+- name: nginx
+  src: git+https://gitlab.com/ansibleroles-mk/nginx-5.git
+  version: main

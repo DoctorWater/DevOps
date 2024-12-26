@@ -1,0 +1,11 @@
+- name: postgres
+  src: git+https://gitlab.com/ansibleroles-mk/postgres-5.git
+  version: main
+  
+- name: nginx
+  src: git+https://gitlab.com/ansibleroles-mk/nginx-5.git
+  version: main
+  
+- name: etcd
+  src: git+https://gitlab.com/ansibleroles-mk/etcd.git
+  version: main
